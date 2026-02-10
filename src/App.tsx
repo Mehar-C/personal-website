@@ -82,6 +82,15 @@ type Project = {
   video?: string;
 };
 
+type Article = {
+  id: string;
+  title: string;
+  subtitle: string;
+  tag: string;
+  link?: string;
+  image?: string;
+};
+
 const PROJECTS: Project[] = [
   {
     id: "highlight-1",
@@ -126,7 +135,25 @@ const PROJECTS: Project[] = [
       "A hackathon project built at Hack Western 10 that explored using computer vision to assist with navigation and directional decision-making. The project focused on interpreting visual input in real time and translating it into actionable guidance, emphasizing accessibility, rapid prototyping, and practical application.",
     stack: "Computer Vision, Python, OpenCV"
   },
+];
 
+const ARTICLES: Article[] = [
+  {
+    id: "article-1",
+    title: "The Thermodynamics of Peter Parker: A Multiverse Audit",
+    subtitle: "My favourite superhero explaining possibly my least favourite topic in physics",
+    tag: "",
+    link: "https://substack.com/home/post/p-186830131",
+    image: "/pictures/thermodynamics-cover.jpg" 
+  },
+  {
+    id: "article-2",
+    title: "The Concept of *The Concept*",
+    subtitle: "I tried explaining conceptual whimsy through fluid mechanics",
+    tag: "",
+    link: "https://substack.com/home/post/p-187474627",
+    image: "/pictures/concept-cover.jpg" 
+  }
 ];
 
 const HERO_QUESTIONS: string[] = [
@@ -315,10 +342,13 @@ const App: React.FC = () => {
   const [heroAnswer, setHeroAnswer] = useState<string>("");
   const [aboutTitle, setAboutTitle] = useState<string>("");
   const [aboutIsCode, setAboutIsCode] = useState<boolean>(true);
-   const [experienceTitle, setExperienceTitle] = useState<string>("");
-   const [experienceIsCode, setExperienceIsCode] = useState<boolean>(true);
-   const [projectsTitle, setProjectsTitle] = useState<string>("");
-   const [projectsIsCode, setProjectsIsCode] = useState<boolean>(true);
+  const [experienceTitle, setExperienceTitle] = useState<string>("");
+  const [experienceIsCode, setExperienceIsCode] = useState<boolean>(true);
+  const [projectsTitle, setProjectsTitle] = useState<string>("");
+  const [projectsIsCode, setProjectsIsCode] = useState<boolean>(true);
+  const [writingTitle, setWritingTitle] = useState<string>("");
+  const [writingIsCode, setWritingIsCode] = useState<boolean>(true);
+  const [activeArticleIndex, setActiveArticleIndex] = useState<number>(0);
 
   useEffect(() => {
     // Adjust the URL if you change the backend port
@@ -354,7 +384,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const name = (profile?.name || "Mehar Chatha").split(" ")[0];
-    const text = `Hey, it's ${name.toLowerCase()}.`;
+    const text = `Hello! i'm ${name.toLowerCase()}.`;
     setFullGreeting(text);
     setTypedGreeting("");
 
@@ -436,6 +466,28 @@ const App: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    const codeText = 'system.out.println("I also write sometimes")';
+    let index = 0;
+    setWritingIsCode(true);
+    setWritingTitle("");
+
+    const interval = setInterval(() => {
+      index += 1;
+      if (index <= codeText.length) {
+        setWritingTitle(codeText.slice(0, index));
+      } else {
+        clearInterval(interval);
+        setTimeout(() => {
+          setWritingIsCode(false);
+          setWritingTitle("#I also write sometimes");
+        }, 600);
+      }
+    }, 70);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const renderGreeting = () => {
     if (!typedGreeting) {
       return null;
@@ -450,7 +502,7 @@ const App: React.FC = () => {
     // before the highlighted name so spacing is always correct.
     return (
       <>
-        {"Hey, it's "}
+        {"Hello! i'm "}
         <span className="hero-name-accent">{firstName.toLowerCase()}</span>
         {"."}
       </>
@@ -498,6 +550,9 @@ const App: React.FC = () => {
   const activeFeatured =
     featuredProjects[(activeFeaturedIndex % featuredProjects.length + featuredProjects.length) %
       featuredProjects.length];
+
+  const activeArticle =
+    ARTICLES[(activeArticleIndex % ARTICLES.length + ARTICLES.length) % ARTICLES.length];
 
   useEffect(() => {
     try {
@@ -551,6 +606,9 @@ const App: React.FC = () => {
           </a>
           <a href="#projects" className="nav-link">
             Projects
+          </a>
+          <a href="#writing" className="nav-link">
+            Writing
           </a>
         </div>
         <div className="nav-icons">
@@ -899,6 +957,98 @@ const App: React.FC = () => {
                 <p className="project-stack">{project.stack}</p>
               </article>
             ))}
+          </div>
+        </section>
+
+        <section id="writing" className="section section-contact">
+          <div className="section-header section-header--grey">
+            <h2 className="section-title">
+              <span className={writingIsCode ? "section-title-code" : ""}>
+                {renderSectionTitle(
+                  writingIsCode,
+                  writingTitle,
+                  "I also write sometimes",
+                  "#I also write sometimes"
+                )}
+              </span>
+              <span className="section-title-line" />
+            </h2>
+            <p>Some random thoughts explained through terms I need to know for my courses.</p>
+          </div>
+          <div className="writing-shell">
+            <div className="writing-layout">
+              <div className="writing-visual">
+                <div className="writing-visual-inner">
+                  <HeroPixelField width={260} height={240} />
+                </div>
+              </div>
+              <div className="writing-layout-right">
+                <div className="writing-carousel">
+                  <button
+                    type="button"
+                    className="writing-arrow"
+                    onClick={() =>
+                      setActiveArticleIndex(
+                        (activeArticleIndex - 1 + ARTICLES.length) % ARTICLES.length
+                      )
+                    }
+                    aria-label="Previous article"
+                  >
+                    ‹
+                  </button>
+                  <a
+                    href={activeArticle.link || "#"}
+                    className="writing-card hover-lift writing-card--hero"
+                    target={activeArticle.link ? "_blank" : undefined}
+                    rel={activeArticle.link ? "noreferrer" : undefined}
+                  >
+                    <div
+                      className="writing-cover"
+                      style={
+                        activeArticle.image
+                          ? {
+                              backgroundImage: `url(${activeArticle.image})`,
+                              backgroundSize: "cover",
+                              backgroundPosition: "center"
+                            }
+                          : undefined
+                      }
+                    >
+                      <span className="writing-tag">{activeArticle.tag}</span>
+                    </div>
+                    <div className="writing-meta">
+                      <h3>{activeArticle.title}</h3>
+                      <p>{activeArticle.subtitle}</p>
+                      <span className="writing-read-link">Read article →</span>
+                    </div>
+                  </a>
+                  <button
+                    type="button"
+                    className="writing-arrow"
+                    onClick={() =>
+                      setActiveArticleIndex((activeArticleIndex + 1) % ARTICLES.length)
+                    }
+                    aria-label="Next article"
+                  >
+                    ›
+                  </button>
+                </div>
+                <div className="writing-controls">
+                  {ARTICLES.map((article, index) => (
+                    <button
+                      key={article.id}
+                      type="button"
+                      className={
+                        "writing-dot" +
+                        (index === activeArticleIndex ? " writing-dot--active" : "")
+                      }
+                      onClick={() => setActiveArticleIndex(index)}
+                      aria-label={`Show article ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
