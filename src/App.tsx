@@ -16,6 +16,7 @@ type Experience = {
   location: string;
   period: string;
   bullets: string[];
+  link?: string;
 };
 
 const EXPERIENCES: Experience[] = [
@@ -25,6 +26,7 @@ const EXPERIENCES: Experience[] = [
     role: "AI Innovation Intern",
     location: "Remote, IN",
     period: "JUNE 2025 – PRESENT",
+    link: "https://www.ikites.ai/",
     bullets: [
       "Designed and implemented AI-enabled data processing pipelines that integrate medical imaging modalities and structured metadata.",
       "Developed scalable workflows for ingesting, transforming, and validating multimodal medical data using Python.",
@@ -37,6 +39,7 @@ const EXPERIENCES: Experience[] = [
     role: "Software Engineer Intern",
     location: "San Francisco, CA",
     period: "May 2025 – August 2025",
+    link: "https://zoomifi.com/",
     bullets: [
       "Implemented a serverless backend using AWS Lambda, API Gateway, DynamoDB, and S3 to support scalable, event-driven applications.",
       "Designed and implemented RESTful APIs for authentication, onboarding, and transaction workflows.",
@@ -50,6 +53,7 @@ const EXPERIENCES: Experience[] = [
     role: "Data Analyst Intern",
     location: "Toronto, ON",
     period: "May 2024 – August 2024",
+    link: "https://www.bce.ca/",
     bullets: [
       "Applied machine learning models to analyze large-scale datasets and identify performance anomalies.",
       "Developed data pipelines using SQL to support forecasting, monitoring, and decision-making.",
@@ -62,6 +66,7 @@ const EXPERIENCES: Experience[] = [
     role: "Software Developer Intern",
     location: "Mississauga, ON",
     period: "May 2023 – August 2023",
+    link: "https://www.rcatsone.com/",
     bullets: [
       "Developed backend services using Java, Spring Boot, and Node.js to support identity and network testing platforms.",
       "Designed REST APIs and data models to improve system performance and reliability.",
@@ -72,10 +77,11 @@ const EXPERIENCES: Experience[] = [
 
 type Project = {
   id: string;
-  name: string;
+  title: string;
   subtitle: string;
   description: string;
-  stack: string;
+  techStack: string;
+  category: "full-stack" | "frontend-uiux" | "backend-ml" | "frontend-ml";
   link?: string;
   repo?: string;
   image?: string;
@@ -91,50 +97,67 @@ type Article = {
   image?: string;
 };
 
+const FEATURED_PROJECTS: Project[] = [
+  {
+    id: "measured-motion",
+    title: "Measured Motion",
+    subtitle: "Making movement measurable.",
+    description:
+      "A project born from dance and recovery. It analyzes motion footage to surface patterns in joint movement and stress, turning raw visual input into structured feedback. Built to explore how data and design can make the body's mechanics more visible.",
+    techStack: "Python · OpenCV · TypeScript · React",
+    category: "full-stack",
+    image: "/pictures/measured-motion.jpg"
+  }
+];
+
 const PROJECTS: Project[] = [
   {
-    id: "highlight-1",
-    name: "AshuChandhok Designs",
-    subtitle: "Project Portfolio & Design Showcase",
-    description:
-      "A custom-built portfolio site created to showcase visual design work, branding projects, and creative experiments. Focused on clean layouts, smooth navigation, and presenting creative work in a clear, professional format.",
-    stack: "HTML, CSS, JavaScript",
-    image: "/pictures/ashu.jpg",
-    link: "https://ashuchandhok.com"
-  },
-  {
-    id: "highlight-2",
-    name: "Anki-Byte",
-    subtitle: "Anki Quick-Add Chrome Extension",
-    description:
-      "Built a Chrome extension that integrates with Anki via the AnkiConnect API, enabling one-click creation of flashcards from highlighted web content. Handles deck selection, card field mapping, and local API communication through a minimal popup UI.",
-    stack: "JavaScript, Chrome Extensions API, AnkiConnect",
-    image: "/pictures/ankibyte.jpg"
-  },
-  {
     id: "grid-1",
-    name: "Anchor",
+    title: "Anchor",
     subtitle: "Stress & Focus Monitoring App",
     description:
       "A prototype wellness application that uses wearable sensor data to infer stress and focus levels over time. Built to explore how physiological signals can be translated into meaningful feedback for self-awareness and habit tracking.",
-    stack: "Apple Watch data, Sensor analysis, TypeScript / React (prototype)"
+    techStack: "Apple Watch data, Sensor analysis, TypeScript / React (prototype)",
+    category: "full-stack"
   },
   {
     id: "grid-2",
-    name: "Kinective",
+    title: "Kinective",
     subtitle: "Gesture-Based Interaction Prototype",
     description:
       "An experimental project exploring gesture recognition as an input method using motion data. Designed to translate human movement into digital actions, with a focus on accessibility, responsiveness, and real-time interaction.",
-    stack: "Computer Vision, Motion Tracking, Python / JavaScript (prototype)"
+    techStack: "Computer Vision, Motion Tracking, Python / JavaScript (prototype)",
+    category: "frontend-ml"
   },
   {
     id: "grid-3",
-    name: "See And Steer (SAS)",
+    title: "See And Steer (SAS)",
     subtitle: "Computer Vision–Driven Navigation Prototype",
     description:
       "A hackathon project built at Hack Western 10 that explored using computer vision to assist with navigation and directional decision-making. The project focused on interpreting visual input in real time and translating it into actionable guidance, emphasizing accessibility, rapid prototyping, and practical application.",
-    stack: "Computer Vision, Python, OpenCV"
+    techStack: "Computer Vision, Python, OpenCV",
+    category: "backend-ml"
   },
+  {
+    id: "grid-4",
+    title: "AshuChandhok Designs",
+    subtitle: "Project Portfolio & Design Showcase",
+    description:
+      "A custom-built portfolio site created to showcase visual design work, branding projects, and creative experiments. Focused on clean layouts, smooth navigation, and presenting creative work in a clear, professional format.",
+    techStack: "HTML · CSS · JavaScript",
+    category: "frontend-uiux",
+    link: "https://ashuchandhok.com"
+  },
+  {
+    id: "grid-5",
+    title: "Anki-Byte",
+    subtitle: "Anki Quick-Add Chrome Extension",
+    description:
+      "Built a Chrome extension that integrates with Anki via the AnkiConnect API, enabling one-click creation of flashcards from highlighted web content. Handles deck selection, card field mapping, and local API communication through a minimal popup UI.",
+    techStack: "JavaScript, Chrome Extensions API, AnkiConnect",
+    category: "full-stack",
+    image: "/pictures/ankibyte.jpg"
+  }
 ];
 
 const ARTICLES: Article[] = [
@@ -402,90 +425,166 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const codeText = 'system.out.println("about me")';
-    let index = 0;
-    setAboutIsCode(true);
-    setAboutTitle("");
+    const finalText = "#about me";
+    let typingInterval: number | undefined;
+    let delayTimeout: number | undefined;
 
-    const interval = setInterval(() => {
-      index += 1;
-      if (index <= codeText.length) {
-        setAboutTitle(codeText.slice(0, index));
-      } else {
-        clearInterval(interval);
-        setTimeout(() => {
+    const startCycle = () => {
+      setAboutIsCode(true);
+      setAboutTitle("");
+      let index = 0;
+
+      typingInterval = window.setInterval(() => {
+        index += 1;
+        if (index <= codeText.length) {
+          setAboutTitle(codeText.slice(0, index));
+        } else {
+          if (typingInterval !== undefined) {
+            window.clearInterval(typingInterval);
+            typingInterval = undefined;
+          }
           setAboutIsCode(false);
-          setAboutTitle("#about me");
-        }, 600);
-      }
-    }, 70);
+          setAboutTitle(finalText);
+          delayTimeout = window.setTimeout(() => {
+            startCycle();
+          }, 10000);
+        }
+      }, 70);
+    };
 
-    return () => clearInterval(interval);
+    startCycle();
+
+    return () => {
+      if (typingInterval !== undefined) {
+        window.clearInterval(typingInterval);
+      }
+      if (delayTimeout !== undefined) {
+        window.clearTimeout(delayTimeout);
+      }
+    };
   }, []);
 
   useEffect(() => {
     const codeText = 'system.out.println("experience")';
-    let index = 0;
-    setExperienceIsCode(true);
-    setExperienceTitle("");
+    const finalText = "#experience";
+    let typingInterval: number | undefined;
+    let delayTimeout: number | undefined;
 
-    const interval = setInterval(() => {
-      index += 1;
-      if (index <= codeText.length) {
-        setExperienceTitle(codeText.slice(0, index));
-      } else {
-        clearInterval(interval);
-        setTimeout(() => {
+    const startCycle = () => {
+      setExperienceIsCode(true);
+      setExperienceTitle("");
+      let index = 0;
+
+      typingInterval = window.setInterval(() => {
+        index += 1;
+        if (index <= codeText.length) {
+          setExperienceTitle(codeText.slice(0, index));
+        } else {
+          if (typingInterval !== undefined) {
+            window.clearInterval(typingInterval);
+            typingInterval = undefined;
+          }
           setExperienceIsCode(false);
-          setExperienceTitle("#experience");
-        }, 600);
-      }
-    }, 70);
+          setExperienceTitle(finalText);
+          delayTimeout = window.setTimeout(() => {
+            startCycle();
+          }, 10000);
+        }
+      }, 70);
+    };
 
-    return () => clearInterval(interval);
+    startCycle();
+
+    return () => {
+      if (typingInterval !== undefined) {
+        window.clearInterval(typingInterval);
+      }
+      if (delayTimeout !== undefined) {
+        window.clearTimeout(delayTimeout);
+      }
+    };
   }, []);
 
   useEffect(() => {
     const codeText = 'system.out.println("projects")';
-    let index = 0;
-    setProjectsIsCode(true);
-    setProjectsTitle("");
+    const finalText = "#projects";
+    let typingInterval: number | undefined;
+    let delayTimeout: number | undefined;
 
-    const interval = setInterval(() => {
-      index += 1;
-      if (index <= codeText.length) {
-        setProjectsTitle(codeText.slice(0, index));
-      } else {
-        clearInterval(interval);
-        setTimeout(() => {
+    const startCycle = () => {
+      setProjectsIsCode(true);
+      setProjectsTitle("");
+      let index = 0;
+
+      typingInterval = window.setInterval(() => {
+        index += 1;
+        if (index <= codeText.length) {
+          setProjectsTitle(codeText.slice(0, index));
+        } else {
+          if (typingInterval !== undefined) {
+            window.clearInterval(typingInterval);
+            typingInterval = undefined;
+          }
           setProjectsIsCode(false);
-          setProjectsTitle("#projects");
-        }, 600);
-      }
-    }, 70);
+          setProjectsTitle(finalText);
+          delayTimeout = window.setTimeout(() => {
+            startCycle();
+          }, 10000);
+        }
+      }, 70);
+    };
 
-    return () => clearInterval(interval);
+    startCycle();
+
+    return () => {
+      if (typingInterval !== undefined) {
+        window.clearInterval(typingInterval);
+      }
+      if (delayTimeout !== undefined) {
+        window.clearTimeout(delayTimeout);
+      }
+    };
   }, []);
 
   useEffect(() => {
     const codeText = 'system.out.println("I also write sometimes")';
-    let index = 0;
-    setWritingIsCode(true);
-    setWritingTitle("");
+    const finalText = "#I also write sometimes";
+    let typingInterval: number | undefined;
+    let delayTimeout: number | undefined;
 
-    const interval = setInterval(() => {
-      index += 1;
-      if (index <= codeText.length) {
-        setWritingTitle(codeText.slice(0, index));
-      } else {
-        clearInterval(interval);
-        setTimeout(() => {
+    const startCycle = () => {
+      setWritingIsCode(true);
+      setWritingTitle("");
+      let index = 0;
+
+      typingInterval = window.setInterval(() => {
+        index += 1;
+        if (index <= codeText.length) {
+          setWritingTitle(codeText.slice(0, index));
+        } else {
+          if (typingInterval !== undefined) {
+            window.clearInterval(typingInterval);
+            typingInterval = undefined;
+          }
           setWritingIsCode(false);
-          setWritingTitle("#I also write sometimes");
-        }, 600);
-      }
-    }, 70);
+          setWritingTitle(finalText);
+          delayTimeout = window.setTimeout(() => {
+            startCycle();
+          }, 10000);
+        }
+      }, 70);
+    };
 
-    return () => clearInterval(interval);
+    startCycle();
+
+    return () => {
+      if (typingInterval !== undefined) {
+        window.clearInterval(typingInterval);
+      }
+      if (delayTimeout !== undefined) {
+        window.clearTimeout(delayTimeout);
+      }
+    };
   }, []);
 
   const renderGreeting = () => {
@@ -544,8 +643,15 @@ const App: React.FC = () => {
     );
   };
 
-  const featuredProjects = PROJECTS.slice(0, 2);
-  const otherProjects = PROJECTS.slice(2);
+  const featuredProjects = FEATURED_PROJECTS;
+  const [activeProjectFilter, setActiveProjectFilter] = useState<
+    "all" | "full-stack" | "frontend-uiux" | "backend-ml" | "frontend-ml"
+  >("all");
+
+  const otherProjects =
+    activeProjectFilter === "all"
+      ? PROJECTS
+      : PROJECTS.filter((project) => project.category === activeProjectFilter);
 
   const activeFeatured =
     featuredProjects[(activeFeaturedIndex % featuredProjects.length + featuredProjects.length) %
@@ -664,8 +770,12 @@ const App: React.FC = () => {
       <main>
         <section className="hero" id="top">
           <div className="hero-visual">
-            <div className="hero-visual-inner">
-              <HeroPixelField />
+            <div className="hero-visual-inner hero-visual-inner--with-photo">
+              <img
+                src="/pictures/mehar-portrait.jpg"
+                alt={profile?.name || "Mehar Chatha"}
+                className="hero-photo"
+              />
             </div>
           </div>
 
@@ -807,7 +917,21 @@ const App: React.FC = () => {
                   <>
                     <h3 className="experience-role">
                       {active.role}
-                      <span className="experience-company">@ {active.company}</span>
+                      <span className="experience-company">
+                        @{" "}
+                        {active.link ? (
+                          <a
+                            href={active.link}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="experience-company-link"
+                          >
+                            {active.company}
+                          </a>
+                        ) : (
+                          active.company
+                        )}
+                      </span>
                     </h3>
                     <p className="experience-meta">
                       <span>{active.period}</span>
@@ -859,19 +983,29 @@ const App: React.FC = () => {
                       activeFeatured.image && (
                         <img
                           src={activeFeatured.image}
-                          alt={activeFeatured.name}
+                          alt={activeFeatured.title}
                           className="featured-project-image"
                         />
                       )
                     )}
                     <div className="featured-project-overlay">
                       <p className="featured-project-label">Featured</p>
-                      <h3 className="featured-project-title">{activeFeatured.name}</h3>
+                      <h3 className="featured-project-title">{activeFeatured.title}</h3>
                       <p className="featured-project-subtitle">{activeFeatured.subtitle}</p>
                       <p className="featured-project-description">
                         {activeFeatured.description}
+                        {activeFeatured.id === "measured-motion" && (
+                          <>
+                            {" "}
+                            <span className="featured-project-status">
+                              <strong>
+                                <em>still very much in progress.</em>
+                              </strong>
+                            </span>
+                          </>
+                        )}
                       </p>
-                      <p className="featured-project-stack">{activeFeatured.stack}</p>
+                      <p className="featured-project-stack">{activeFeatured.techStack}</p>
                     </div>
                   </div>
                 </a>
@@ -890,73 +1024,89 @@ const App: React.FC = () => {
                     activeFeatured.image && (
                       <img
                         src={activeFeatured.image}
-                        alt={activeFeatured.name}
+                        alt={activeFeatured.title}
                         className="featured-project-image"
                       />
                     )
                   )}
                   <div className="featured-project-overlay">
                     <p className="featured-project-label">Featured</p>
-                    <h3 className="featured-project-title">{activeFeatured.name}</h3>
+                    <h3 className="featured-project-title">{activeFeatured.title}</h3>
                     <p className="featured-project-subtitle">{activeFeatured.subtitle}</p>
                     <p className="featured-project-description">
                       {activeFeatured.description}
+                      {activeFeatured.id === "measured-motion" && (
+                        <>
+                          {" "}
+                          <span className="featured-project-status">
+                            <strong>
+                              <em>still very much in progress.</em>
+                            </strong>
+                          </span>
+                        </>
+                      )}
                     </p>
-                    <p className="featured-project-stack">{activeFeatured.stack}</p>
+                    <p className="featured-project-stack">{activeFeatured.techStack}</p>
                   </div>
                 </div>
               )}
             </div>
+          </div>
 
-            <div className="featured-project-controls">
+          <div className="projects-filter">
+            {[
+              { id: "all", label: "All" },
+              { id: "full-stack", label: "Full-Stack" },
+              { id: "frontend-uiux", label: "Frontend / UI-UX" },
+              { id: "backend-ml", label: "Backend / ML" },
+              { id: "frontend-ml", label: "Frontend + ML (Hybrid)" }
+            ].map((filter) => (
               <button
+                key={filter.id}
                 type="button"
-                className="featured-arrow"
+                className={
+                  "projects-filter-chip" +
+                  (activeProjectFilter === filter.id ? " projects-filter-chip--active" : "")
+                }
                 onClick={() =>
-                  setActiveFeaturedIndex(
-                    (activeFeaturedIndex - 1 + featuredProjects.length) % featuredProjects.length
-                  )
+                  setActiveProjectFilter(filter.id as typeof activeProjectFilter)
                 }
               >
-                ←
+                {filter.label}
               </button>
-              <div className="featured-dots">
-                {featuredProjects.map((proj, index) => (
-                  <button
-                    key={proj.id}
-                    type="button"
-                    className={
-                      "featured-dot" +
-                      (index === activeFeaturedIndex ? " featured-dot--active" : "")
-                    }
-                    onClick={() => setActiveFeaturedIndex(index)}
-                  />
-                ))}
-              </div>
-              <button
-                type="button"
-                className="featured-arrow"
-                onClick={() =>
-                  setActiveFeaturedIndex((activeFeaturedIndex + 1) % featuredProjects.length)
-                }
-              >
-                →
-              </button>
-            </div>
+            ))}
           </div>
 
           <div className="projects-grid">
-            {otherProjects.map((project) => (
-              <article key={project.id} className="project-card hover-lift">
-                <div className="project-header">
-                  <div className="project-orbit-dot" />
-                  <h3>{project.name}</h3>
-                </div>
-                <p className="project-subtitle">{project.subtitle}</p>
-                <p className="project-body">{project.description}</p>
-                <p className="project-stack">{project.stack}</p>
-              </article>
-            ))}
+            {otherProjects.map((project) => {
+              const content = (
+                <>
+                  <div className="project-header">
+                    <div className="project-orbit-dot" />
+                    <h3>{project.title}</h3>
+                  </div>
+                  <p className="project-subtitle">{project.subtitle}</p>
+                  <p className="project-body">{project.description}</p>
+                  <p className="project-stack">{project.techStack}</p>
+                </>
+              );
+
+              return project.link ? (
+                <a
+                  key={project.id}
+                  href={project.link}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="project-card hover-lift project-card--link"
+                >
+                  {content}
+                </a>
+              ) : (
+                <article key={project.id} className="project-card hover-lift">
+                  {content}
+                </article>
+              );
+            })}
           </div>
         </section>
 
@@ -976,78 +1126,36 @@ const App: React.FC = () => {
             <p>Some random thoughts explained through terms I need to know for my courses.</p>
           </div>
           <div className="writing-shell">
-            <div className="writing-layout">
-              <div className="writing-visual">
-                <div className="writing-visual-inner">
-                  <HeroPixelField width={260} height={240} />
-                </div>
-              </div>
-              <div className="writing-layout-right">
-                <div className="writing-carousel">
-                  <button
-                    type="button"
-                    className="writing-arrow"
-                    onClick={() =>
-                      setActiveArticleIndex(
-                        (activeArticleIndex - 1 + ARTICLES.length) % ARTICLES.length
-                      )
+            <div className="writing-grid">
+              {ARTICLES.map((article) => (
+                <a
+                  key={article.id}
+                  href={article.link || "#"}
+                  className="writing-card hover-lift writing-card--hero"
+                  target={article.link ? "_blank" : undefined}
+                  rel={article.link ? "noreferrer" : undefined}
+                >
+                  <div
+                    className="writing-cover"
+                    style={
+                      article.image
+                        ? {
+                            backgroundImage: `url(${article.image})`,
+                            backgroundSize: "cover",
+                            backgroundPosition: "center"
+                          }
+                        : undefined
                     }
-                    aria-label="Previous article"
                   >
-                    ‹
-                  </button>
-                  <a
-                    href={activeArticle.link || "#"}
-                    className="writing-card hover-lift writing-card--hero"
-                    target={activeArticle.link ? "_blank" : undefined}
-                    rel={activeArticle.link ? "noreferrer" : undefined}
-                  >
-                    <div
-                      className="writing-cover"
-                      style={
-                        activeArticle.image
-                          ? {
-                              backgroundImage: `url(${activeArticle.image})`,
-                              backgroundSize: "cover",
-                              backgroundPosition: "center"
-                            }
-                          : undefined
-                      }
-                    >
-                      <span className="writing-tag">{activeArticle.tag}</span>
-                    </div>
-                    <div className="writing-meta">
-                      <h3>{activeArticle.title}</h3>
-                      <p>{activeArticle.subtitle}</p>
-                      <span className="writing-read-link">Read article →</span>
-                    </div>
-                  </a>
-                  <button
-                    type="button"
-                    className="writing-arrow"
-                    onClick={() =>
-                      setActiveArticleIndex((activeArticleIndex + 1) % ARTICLES.length)
-                    }
-                    aria-label="Next article"
-                  >
-                    ›
-                  </button>
-                </div>
-                <div className="writing-controls">
-                  {ARTICLES.map((article, index) => (
-                    <button
-                      key={article.id}
-                      type="button"
-                      className={
-                        "writing-dot" +
-                        (index === activeArticleIndex ? " writing-dot--active" : "")
-                      }
-                      onClick={() => setActiveArticleIndex(index)}
-                      aria-label={`Show article ${index + 1}`}
-                    />
-                  ))}
-                </div>
-              </div>
+                    {article.tag && <span className="writing-tag">{article.tag}</span>}
+                  </div>
+                  <div className="writing-meta">
+                    <h3>{article.title}</h3>
+                    <p>{article.subtitle}</p>
+                    <span className="writing-read-link">Read article →</span>
+                  </div>
+                </a>
+              ))}
             </div>
           </div>
         </section>
