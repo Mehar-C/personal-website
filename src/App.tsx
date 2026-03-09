@@ -164,10 +164,11 @@ const ARTICLES: Article[] = [
   {
     id: "article-1",
     title: "The Thermodynamics of Peter Parker: A Multiverse Audit",
-    subtitle: "My favourite superhero explaining possibly my least favourite topic in physics",
+    subtitle:
+      "My favourite superhero explaining possibly my least favourite topic in physics",
     tag: "",
     link: "https://substack.com/home/post/p-186830131",
-    image: "/pictures/thermodynamics-cover.jpg" 
+    image: "/pictures/thermodynamics-cover.jpg"
   },
   {
     id: "article-2",
@@ -175,7 +176,16 @@ const ARTICLES: Article[] = [
     subtitle: "I tried explaining conceptual whimsy through fluid mechanics",
     tag: "",
     link: "https://substack.com/home/post/p-187474627",
-    image: "/pictures/concept-cover.jpg" 
+    image: "/pictures/concept-cover.jpg"
+  },
+  {
+    id: "article-3",
+    title: "The Art of Platonic Love: An Ode to Girlhood",
+    subtitle:
+      "A manifesto on the psychic, healing, and slightly unhinged power of the women who make everything brighter.",
+    tag: "",
+    link: "https://substack.com/home/post/p-190356489",
+    image: "/pictures/sub3.jpeg"
   }
 ];
 
@@ -1126,35 +1136,80 @@ const App: React.FC = () => {
             <p>Some random thoughts explained through terms I need to know for my courses.</p>
           </div>
           <div className="writing-shell">
-            <div className="writing-grid">
-              {ARTICLES.map((article) => (
-                <a
+            <div className="writing-carousel">
+              <button
+                type="button"
+                className="writing-arrow"
+                onClick={() =>
+                  setActiveArticleIndex(
+                    (prev) => (prev - 1 + ARTICLES.length) % ARTICLES.length
+                  )
+                }
+                aria-label="Previous article"
+              >
+                ‹
+              </button>
+
+              <div className="writing-track">
+                {[0, 1].map((offset) => {
+                  const article =
+                    ARTICLES[
+                      (activeArticleIndex + offset + ARTICLES.length) % ARTICLES.length
+                    ];
+
+                  return (
+                    <a
+                      key={article.id}
+                      href={article.link || "#"}
+                      className="writing-card hover-lift writing-card--hero"
+                      target={article.link ? "_blank" : undefined}
+                      rel={article.link ? "noreferrer" : undefined}
+                    >
+                      <div
+                        className="writing-cover"
+                        style={
+                          article.image
+                            ? {
+                                backgroundImage: `url(${article.image})`,
+                                backgroundSize: "cover",
+                                backgroundPosition: "center"
+                              }
+                            : undefined
+                        }
+                      >
+                        {article.tag && <span className="writing-tag">{article.tag}</span>}
+                      </div>
+                      <div className="writing-meta">
+                        <h3>{article.title}</h3>
+                        <p>{article.subtitle}</p>
+                        <span className="writing-read-link">Read article →</span>
+                      </div>
+                    </a>
+                  );
+                })}
+              </div>
+
+              <button
+                type="button"
+                className="writing-arrow"
+                onClick={() => setActiveArticleIndex((prev) => (prev + 1) % ARTICLES.length)}
+                aria-label="Next article"
+              >
+                ›
+              </button>
+            </div>
+
+            <div className="writing-controls">
+              {ARTICLES.map((article, index) => (
+                <button
                   key={article.id}
-                  href={article.link || "#"}
-                  className="writing-card hover-lift writing-card--hero"
-                  target={article.link ? "_blank" : undefined}
-                  rel={article.link ? "noreferrer" : undefined}
-                >
-                  <div
-                    className="writing-cover"
-                    style={
-                      article.image
-                        ? {
-                            backgroundImage: `url(${article.image})`,
-                            backgroundSize: "cover",
-                            backgroundPosition: "center"
-                          }
-                        : undefined
-                    }
-                  >
-                    {article.tag && <span className="writing-tag">{article.tag}</span>}
-                  </div>
-                  <div className="writing-meta">
-                    <h3>{article.title}</h3>
-                    <p>{article.subtitle}</p>
-                    <span className="writing-read-link">Read article →</span>
-                  </div>
-                </a>
+                  type="button"
+                  className={
+                    "writing-dot" + (index === activeArticleIndex ? " writing-dot--active" : "")
+                  }
+                  onClick={() => setActiveArticleIndex(index)}
+                  aria-label={`Go to article: ${article.title}`}
+                />
               ))}
             </div>
           </div>

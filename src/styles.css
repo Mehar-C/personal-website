@@ -1361,6 +1361,13 @@ html[data-theme="light"] .footer {
   gap: 16px;
 }
 
+.writing-track {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  flex: 1;
+}
+
 .writing-controls {
   display: flex;
   justify-content: center;
@@ -1406,7 +1413,7 @@ html[data-theme="light"] .footer {
 }
 
 .writing-card--hero {
-  max-width: 520px;
+  max-width: none;
 }
 
 .writing-cta {
