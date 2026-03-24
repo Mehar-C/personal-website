@@ -81,7 +81,7 @@ type Project = {
   subtitle: string;
   description: string;
   techStack: string;
-  category: "full-stack" | "frontend-uiux" | "backend-ml" | "frontend-ml";
+  category: "full-stack" | "frontend-uiux" | "backend-ml" | "frontend-ml" | "cad";
   link?: string;
   repo?: string;
   image?: string;
@@ -97,18 +97,20 @@ type Article = {
   image?: string;
 };
 
-const FEATURED_PROJECTS: Project[] = [
-  {
-    id: "measured-motion",
-    title: "Measured Motion",
-    subtitle: "Making movement measurable.",
-    description:
-      "A project born from dance and recovery. It analyzes motion footage to surface patterns in joint movement and stress, turning raw visual input into structured feedback. Built to explore how data and design can make the body's mechanics more visible.",
-    techStack: "Python · OpenCV · TypeScript · React",
-    category: "full-stack",
-    image: "/pictures/measured-motion.jpg"
-  }
-];
+const CAD_HACKATHON_PROJECT: Project = {
+  id: "cad-hackathon",
+  title: "The Flextension Assist",
+  subtitle: "Wearable mobility support prototype for assisted knee stabilization.",
+  description:
+    "A concept device designed to support knee movement and reduce instability during walking. Built around a lightweight brace system with integrated sensing and assistive support, the design explored how hardware, fit, and user comfort could work together in a practical mobility aid for everyday use.",
+  techStack: "Wearable design · IMU sensors · assistive mobility · CAD prototyping",
+  category: "cad",
+  image: "/pictures/cad-hackathon.jpg",
+  video: "/videos/medsprint%20vid%202.mov",
+  link: undefined
+};
+
+const FEATURED_PROJECTS: Project[] = [CAD_HACKATHON_PROJECT];
 
 const PROJECTS: Project[] = [
   {
@@ -157,7 +159,8 @@ const PROJECTS: Project[] = [
     techStack: "JavaScript, Chrome Extensions API, AnkiConnect",
     category: "full-stack",
     image: "/pictures/ankibyte.jpg"
-  }
+  },
+  CAD_HACKATHON_PROJECT
 ];
 
 const ARTICLES: Article[] = [
@@ -655,7 +658,7 @@ const App: React.FC = () => {
 
   const featuredProjects = FEATURED_PROJECTS;
   const [activeProjectFilter, setActiveProjectFilter] = useState<
-    "all" | "full-stack" | "frontend-uiux" | "backend-ml" | "frontend-ml"
+    "all" | "full-stack" | "frontend-uiux" | "backend-ml" | "frontend-ml" | "cad"
   >("all");
 
   const otherProjects =
@@ -984,6 +987,7 @@ const App: React.FC = () => {
                       <video
                         className="featured-project-video"
                         src={activeFeatured.video}
+                        poster={activeFeatured.image}
                         autoPlay
                         muted
                         loop
@@ -1002,19 +1006,7 @@ const App: React.FC = () => {
                       <p className="featured-project-label">Featured</p>
                       <h3 className="featured-project-title">{activeFeatured.title}</h3>
                       <p className="featured-project-subtitle">{activeFeatured.subtitle}</p>
-                      <p className="featured-project-description">
-                        {activeFeatured.description}
-                        {activeFeatured.id === "measured-motion" && (
-                          <>
-                            {" "}
-                            <span className="featured-project-status">
-                              <strong>
-                                <em>still very much in progress.</em>
-                              </strong>
-                            </span>
-                          </>
-                        )}
-                      </p>
+                      <p className="featured-project-description">{activeFeatured.description}</p>
                       <p className="featured-project-stack">{activeFeatured.techStack}</p>
                     </div>
                   </div>
@@ -1025,6 +1017,7 @@ const App: React.FC = () => {
                     <video
                       className="featured-project-video"
                       src={activeFeatured.video}
+                      poster={activeFeatured.image}
                       autoPlay
                       muted
                       loop
@@ -1043,19 +1036,7 @@ const App: React.FC = () => {
                     <p className="featured-project-label">Featured</p>
                     <h3 className="featured-project-title">{activeFeatured.title}</h3>
                     <p className="featured-project-subtitle">{activeFeatured.subtitle}</p>
-                    <p className="featured-project-description">
-                      {activeFeatured.description}
-                      {activeFeatured.id === "measured-motion" && (
-                        <>
-                          {" "}
-                          <span className="featured-project-status">
-                            <strong>
-                              <em>still very much in progress.</em>
-                            </strong>
-                          </span>
-                        </>
-                      )}
-                    </p>
+                    <p className="featured-project-description">{activeFeatured.description}</p>
                     <p className="featured-project-stack">{activeFeatured.techStack}</p>
                   </div>
                 </div>
@@ -1069,7 +1050,8 @@ const App: React.FC = () => {
               { id: "full-stack", label: "Full-Stack" },
               { id: "frontend-uiux", label: "Frontend / UI-UX" },
               { id: "backend-ml", label: "Backend / ML" },
-              { id: "frontend-ml", label: "Frontend + ML (Hybrid)" }
+              { id: "frontend-ml", label: "Frontend + ML (Hybrid)" },
+              { id: "cad", label: "CAD" }
             ].map((filter) => (
               <button
                 key={filter.id}
