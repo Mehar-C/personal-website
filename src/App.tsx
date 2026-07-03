@@ -785,7 +785,7 @@ const App: React.FC = () => {
           <div className="hero-visual">
             <div className="hero-visual-inner hero-visual-inner--with-photo">
               <img
-                src="/pictures/mehar-portrait.jpg"
+                src="/pictures/newheadshot.png"
                 alt={profile?.name || "Mehar Chatha"}
                 className="hero-photo"
               />
