@@ -28,9 +28,9 @@ const EXPERIENCES: Experience[] = [
     period: "JUNE 2025 – PRESENT",
     link: "https://www.ikites.ai/",
     bullets: [
-      "Designed and implemented AI-enabled data processing pipelines that integrate medical imaging modalities and structured metadata.",
-      "Developed scalable workflows for ingesting, transforming, and validating multimodal medical data using Python.",
-      "Ensured data security, traceability, and reproducibility within cloud-based analysis systems."
+      "Built backend data pipelines that integrate multimodal medical imaging with structured metadata, with an emphasis on validation and reliability.",
+      "Developed workflows for ingesting, transforming, and validating large-scale imaging datasets, improving processing speed and reducing failures.",
+      "Worked with a cross-functional team to streamline reporting processes, cutting reporting time by close to 15%."
     ]
   },
   {
@@ -41,9 +41,9 @@ const EXPERIENCES: Experience[] = [
     period: "May 2025 – August 2025",
     link: "https://zoomifi.com/",
     bullets: [
-      "Implemented a serverless backend using AWS Lambda, API Gateway, DynamoDB, and S3 to support scalable, event-driven applications.",
-      "Designed and implemented RESTful APIs for authentication, onboarding, and transaction workflows.",
-      "Integrated third-party webhooks (Stripe, Clover) with idempotent processing and robust error handling.",
+      "Built a serverless backend to support scalable, event-driven applications, handling a high volume of daily transactions with strong fault tolerance.",
+      "Designed and implemented REST APIs for authentication, onboarding, and transaction workflows.",
+      "Integrated third-party payment and POS webhooks with idempotent processing to prevent duplicate events.",
       "Improved system reliability and maintainability through modular design and clear API contracts."
     ]
   },
@@ -55,9 +55,9 @@ const EXPERIENCES: Experience[] = [
     period: "May 2024 – August 2024",
     link: "https://www.bce.ca/",
     bullets: [
-      "Applied machine learning models to analyze large-scale datasets and identify performance anomalies.",
+      "Applied statistical modeling and predictive analytics to large-scale operational datasets to identify performance anomalies.",
       "Developed data pipelines using SQL to support forecasting, monitoring, and decision-making.",
-      "Strengthened system reliability through predictive analytics and automation."
+      "Strengthened system reliability through predictive analytics and process automation."
     ]
   },
   {
@@ -70,10 +70,13 @@ const EXPERIENCES: Experience[] = [
     bullets: [
       "Developed backend services using Java, Spring Boot, and Node.js to support identity and network testing platforms.",
       "Designed REST APIs and data models to improve system performance and reliability.",
-      "Created automation scripts and UML-based system designs to reduce manual operational overhead."
+      "Created automation scripts and UML-based system designs to reduce manual operational overhead.",
+      "Added validation and error-handling improvements to reduce regressions across backend releases."
     ]
   }
 ];
+
+type ProjectCategory = "full-stack" | "frontend-uiux" | "backend-ml" | "frontend-ml" | "cad";
 
 type Project = {
   id: string;
@@ -81,12 +84,37 @@ type Project = {
   subtitle: string;
   description: string;
   techStack: string;
-  category: "full-stack" | "frontend-uiux" | "backend-ml" | "frontend-ml" | "cad";
+  categories: ProjectCategory[];
   link?: string;
   repo?: string;
   image?: string;
   video?: string;
 };
+
+type FeaturedProject = Project & {
+  highlights?: string[];
+  demoLink?: string;
+  repoLink?: string;
+  embedDemo?: boolean;
+  contextLabel?: string;
+};
+
+const PROJECT_CATEGORY_LABELS: Record<ProjectCategory, string> = {
+  "full-stack": "Full-Stack",
+  "frontend-uiux": "Frontend / UI-UX",
+  "backend-ml": "Backend / ML",
+  "frontend-ml": "Frontend + ML (Hybrid)",
+  cad: "CAD"
+};
+
+const PROJECT_FILTERS: { id: "all" | ProjectCategory; label: string }[] = [
+  { id: "all", label: "All" },
+  { id: "full-stack", label: PROJECT_CATEGORY_LABELS["full-stack"] },
+  { id: "frontend-uiux", label: PROJECT_CATEGORY_LABELS["frontend-uiux"] },
+  { id: "backend-ml", label: PROJECT_CATEGORY_LABELS["backend-ml"] },
+  { id: "frontend-ml", label: PROJECT_CATEGORY_LABELS["frontend-ml"] },
+  { id: "cad", label: PROJECT_CATEGORY_LABELS.cad }
+];
 
 type Article = {
   id: string;
@@ -97,6 +125,14 @@ type Article = {
   image?: string;
 };
 
+const TD_FIRST_HOME_HUB_DEMO_URL = "https://td-first-home-hub.vercel.app/";
+
+const parseTechStack = (techStack: string): string[] =>
+  techStack
+    .split(/\s*[·,|/]\s*/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+
 const CAD_HACKATHON_PROJECT: Project = {
   id: "cad-hackathon",
   title: "The Flextension Assist",
@@ -104,13 +140,53 @@ const CAD_HACKATHON_PROJECT: Project = {
   description:
     "A concept device designed to support knee movement and reduce instability during walking. Built around a lightweight brace system with integrated sensing and assistive support, the design explored how hardware, fit, and user comfort could work together in a practical mobility aid for everyday use.",
   techStack: "Wearable design · IMU sensors · assistive mobility · CAD prototyping",
-  category: "cad",
+  categories: ["cad", "frontend-ml"],
   image: "/pictures/cad-hackathon.jpg",
   video: "/videos/medsprint%20vid%202.mov",
   link: undefined
 };
 
-const FEATURED_PROJECTS: Project[] = [CAD_HACKATHON_PROJECT];
+const TD_FIRST_HOME_HUB_FEATURED: FeaturedProject = {
+  id: "first-home-hub",
+  title: "TD First Home Hub",
+  subtitle: "",
+  description:
+    "Banks typically engage first-time buyers at Stage 5 — mortgage application. First Home Hub captures users at Stage 1 (pre-savings), positioning TD as a trusted guide 12–24 months before purchase.",
+  techStack: "React · TypeScript · Tailwind CSS · Vite",
+  categories: ["frontend-uiux"],
+  contextLabel: "EY design competition · concept pitch",
+  highlights: [
+    "Readiness score, savings goals, and FHSA pre-savings tracking",
+    "Affordability tools and credit monitoring",
+    "Agentic AI co-pilot with specialist routing (mortgage, planning, insurance)",
+    "Milestones roadmap and closing / ownership checklist"
+  ],
+  demoLink: TD_FIRST_HOME_HUB_DEMO_URL,
+  embedDemo: true
+};
+
+const ATLAS_FEATURED: FeaturedProject = {
+  id: "atlas",
+  title: "Atlas — Codebase Visualizer",
+  subtitle: "",
+  description:
+    "Paste a GitHub URL and Atlas maps every service, queue, database, and external API into a navigable 3D graph — then exports structured context your agents can operate on without guessing.",
+  techStack: "Next.js · TypeScript · Three.js · Fastify · SQLite",
+  categories: ["full-stack", "frontend-ml", "backend-ml"],
+  highlights: [
+    "Interactive 3D architecture graph",
+    "Agent-ready markdown context export",
+    "AI-powered handoff assistant",
+    "Evidence-grounded confidence scoring"
+  ],
+  repoLink: "https://github.com/lifexmetric/atlas"
+};
+
+const FEATURED_PROJECTS: FeaturedProject[] = [
+  TD_FIRST_HOME_HUB_FEATURED,
+  ATLAS_FEATURED,
+  CAD_HACKATHON_PROJECT
+];
 
 const PROJECTS: Project[] = [
   {
@@ -118,9 +194,9 @@ const PROJECTS: Project[] = [
     title: "Anchor",
     subtitle: "Stress & Focus Monitoring App",
     description:
-      "A prototype wellness application that uses wearable sensor data to infer stress and focus levels over time. Built to explore how physiological signals can be translated into meaningful feedback for self-awareness and habit tracking.",
-    techStack: "Apple Watch data, Sensor analysis, TypeScript / React (prototype)",
-    category: "full-stack"
+      "A prototype wellness application that uses wearable sensor data and a Python-based model to infer stress and focus levels over time, with a TypeScript/React interface for visualization.",
+    techStack: "Python, sensor data analysis, TypeScript/React (prototype)",
+    categories: ["full-stack", "frontend-ml"]
   },
   {
     id: "grid-2",
@@ -129,7 +205,7 @@ const PROJECTS: Project[] = [
     description:
       "An experimental project exploring gesture recognition as an input method using motion data. Designed to translate human movement into digital actions, with a focus on accessibility, responsiveness, and real-time interaction.",
     techStack: "Computer Vision, Motion Tracking, Python / JavaScript (prototype)",
-    category: "frontend-ml"
+    categories: ["frontend-ml"]
   },
   {
     id: "grid-3",
@@ -138,7 +214,7 @@ const PROJECTS: Project[] = [
     description:
       "A hackathon project built at Hack Western 10 that explored using computer vision to assist with navigation and directional decision-making. The project focused on interpreting visual input in real time and translating it into actionable guidance, emphasizing accessibility, rapid prototyping, and practical application.",
     techStack: "Computer Vision, Python, OpenCV",
-    category: "backend-ml"
+    categories: ["backend-ml", "frontend-ml"]
   },
   {
     id: "grid-4",
@@ -147,7 +223,7 @@ const PROJECTS: Project[] = [
     description:
       "A custom-built portfolio site created to showcase visual design work, branding projects, and creative experiments. Focused on clean layouts, smooth navigation, and presenting creative work in a clear, professional format.",
     techStack: "HTML · CSS · JavaScript",
-    category: "frontend-uiux",
+    categories: ["frontend-uiux", "full-stack"],
     link: "https://ashuchandhok.com"
   },
   {
@@ -157,8 +233,37 @@ const PROJECTS: Project[] = [
     description:
       "Built a Chrome extension that integrates with Anki via the AnkiConnect API, enabling one-click creation of flashcards from highlighted web content. Handles deck selection, card field mapping, and local API communication through a minimal popup UI.",
     techStack: "JavaScript, Chrome Extensions API, AnkiConnect",
-    category: "full-stack",
+    categories: ["full-stack"],
     image: "/pictures/ankibyte.jpg"
+  },
+  {
+    id: "grid-6",
+    title: "ikitesconsulting.ca",
+    subtitle: "Advisory & Consulting Client Site",
+    description:
+      "A client-facing site for iKITES Consulting, highlighting public safety technology, AI and digital transformation, NG911 support, and real-time operations. Built with React and Next.js, connected to backend APIs for content, forms, and integrations.",
+    techStack: "React · Next.js · TypeScript · Node.js · REST APIs",
+    categories: ["full-stack", "frontend-uiux"],
+    link: "https://ikitesconsulting.ca"
+  },
+  {
+    id: "grid-7",
+    title: "Serverless Donation & Merchant Platform",
+    subtitle: "Event-Driven Payments Backend",
+    description:
+      "Serverless backend supporting donation flows and merchant onboarding with AWS Lambda, API Gateway, DynamoDB, and S3. Integrated Stripe and POS webhooks with idempotent processing for reliable, high-volume transaction handling.",
+    techStack: "AWS Lambda · API Gateway · DynamoDB · S3 · Stripe · Node.js",
+    categories: ["full-stack", "backend-ml"]
+  },
+  {
+    id: "first-home-hub",
+    title: "TD First Home Hub",
+    subtitle: "Mobile banking mockup — first-time buyer journey",
+    description:
+      "An interactive TD mobile prototype that meets first-time buyers at Stage 1 (pre-savings) with readiness scoring, savings goals, FHSA tracking, affordability tools, agentic AI specialist routing, and closing checklists.",
+    techStack: "React · TypeScript · Tailwind CSS · Vite",
+    categories: ["frontend-uiux"],
+    link: TD_FIRST_HOME_HUB_DEMO_URL
   },
   CAD_HACKATHON_PROJECT
 ];
@@ -385,6 +490,30 @@ const App: React.FC = () => {
   const [writingTitle, setWritingTitle] = useState<string>("");
   const [writingIsCode, setWritingIsCode] = useState<boolean>(true);
   const [activeArticleIndex, setActiveArticleIndex] = useState<number>(0);
+  const [tdDemoExpanded, setTdDemoExpanded] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!tdDemoExpanded) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setTdDemoExpanded(false);
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [tdDemoExpanded]);
+
+  useEffect(() => {
+    const featured = FEATURED_PROJECTS[activeFeaturedIndex];
+    if (!featured?.embedDemo) {
+      setTdDemoExpanded(false);
+    }
+  }, [activeFeaturedIndex]);
 
   useEffect(() => {
     // Adjust the URL if you change the backend port
@@ -399,7 +528,7 @@ const App: React.FC = () => {
           location: "Toronto, Canada",
           summary:
             "I build things, ask really random questions, and love a good cup of coffee.",
-          skills: ["Java", "TypeScript", "React", "Spring Boot", "REST APIs", "UI/UX"],
+          skills: ["Python", "TypeScript", "React", "Node.js", "REST APIs", "UI/UX"],
           projects: [
             {
               name: "Interactive Portfolio",
@@ -657,14 +786,64 @@ const App: React.FC = () => {
   };
 
   const featuredProjects = FEATURED_PROJECTS;
-  const [activeProjectFilter, setActiveProjectFilter] = useState<
-    "all" | "full-stack" | "frontend-uiux" | "backend-ml" | "frontend-ml" | "cad"
-  >("all");
+  const [activeProjectFilter, setActiveProjectFilter] = useState<"all" | ProjectCategory>("all");
+  const [expandedProjectId, setExpandedProjectId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setExpandedProjectId(null);
+  }, [activeProjectFilter]);
 
   const otherProjects =
     activeProjectFilter === "all"
       ? PROJECTS
-      : PROJECTS.filter((project) => project.category === activeProjectFilter);
+      : PROJECTS.filter((project) => project.categories.includes(activeProjectFilter));
+
+  const renderProjectTimelineStep = (project: Project, index: number, suffix: string) => {
+    const isActive = expandedProjectId === project.id;
+    const primaryCategory = project.categories[0];
+    const tools = parseTechStack(project.techStack);
+
+    return (
+      <button
+        key={`${project.id}-${suffix}`}
+        type="button"
+        role="listitem"
+        className={
+          "projects-timeline-step" +
+          (isActive ? " projects-timeline-step--active" : "") +
+          ` projects-timeline-step--${primaryCategory}`
+        }
+        onClick={() =>
+          setExpandedProjectId((current) => (current === project.id ? null : project.id))
+        }
+        aria-expanded={isActive}
+        aria-label={`${project.title} — ${project.techStack}`}
+      >
+        <div className="projects-timeline-node">
+          <span className="projects-timeline-glow" aria-hidden="true" />
+          <span
+            className={`projects-timeline-icon projects-timeline-icon--${primaryCategory}`}
+            aria-hidden="true"
+          >
+            {project.title.charAt(0)}
+          </span>
+          <span className="projects-timeline-index" aria-hidden="true">
+            {String(index + 1).padStart(2, "0")}
+          </span>
+        </div>
+        <div className="projects-timeline-card">
+          <h3 className="projects-timeline-title">{project.title}</h3>
+          <ul className="projects-timeline-tools">
+            {tools.map((tool) => (
+              <li key={`${project.id}-${suffix}-${tool}`} className="projects-timeline-tool">
+                {tool}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </button>
+    );
+  };
 
   const activeFeatured =
     featuredProjects[(activeFeaturedIndex % featuredProjects.length + featuredProjects.length) %
@@ -826,7 +1005,7 @@ const App: React.FC = () => {
               </span>
               <span className="pill">
                 Loves{" "}
-                {(profile?.skills || ["Java", "TypeScript", "Animations"])
+                {(profile?.skills || ["Python", "TypeScript", "React"])
                   .slice(0, 3)
                   .join(" · ")}
               </span>
@@ -879,9 +1058,9 @@ const App: React.FC = () => {
                 <div className="about-meta-group">
                   <p className="about-label">technologies I've worked with</p>
                   <div className="about-chips">
-                    <span className="about-chip">Python, Java, C++, SQL &amp; React</span>
-                    <span className="about-chip">Spring Boot, Django, Flask, FastAPI</span>
-                    <span className="about-chip">AWS, DynamoDB, S3, Lambda</span>
+                    <span className="about-chip">Python, Java, JavaScript, TypeScript, C++, SQL</span>
+                    <span className="about-chip">Node.js, React, Next.js, Spring Boot</span>
+                    <span className="about-chip">AWS (Lambda, API Gateway, DynamoDB, S3)</span>
                   </div>
                 </div>
       
@@ -974,132 +1153,444 @@ const App: React.FC = () => {
           </div>
 
           <div className="featured-project">
-            <div className="featured-project-card">
-              {activeFeatured.link ? (
-                <a
-                  href={activeFeatured.link}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="featured-project-link"
-                >
-                  <div className="featured-project-media">
-                    {activeFeatured.video ? (
-                      <video
-                        className="featured-project-video"
-                        src={activeFeatured.video}
-                        poster={activeFeatured.image}
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                      />
-                    ) : (
-                      activeFeatured.image && (
-                        <img
-                          src={activeFeatured.image}
-                          alt={activeFeatured.title}
-                          className="featured-project-image"
-                        />
-                      )
-                    )}
-                    <div className="featured-project-overlay">
-                      <p className="featured-project-label">Featured</p>
-                      <h3 className="featured-project-title">{activeFeatured.title}</h3>
-                      <p className="featured-project-subtitle">{activeFeatured.subtitle}</p>
-                      <p className="featured-project-description">{activeFeatured.description}</p>
-                      <p className="featured-project-stack">{activeFeatured.techStack}</p>
+            {(() => {
+              const featured = activeFeatured;
+
+              if (featured.embedDemo) {
+                return (
+                  <>
+                    <div
+                      className="featured-project-card featured-project-card--embed"
+                      id="first-home-hub"
+                    >
+                      <div className="featured-project-embed">
+                        <div className="featured-project-embed-copy">
+                          <p className="featured-project-label">Featured</p>
+                          {featured.contextLabel && (
+                            <p className="featured-project-context">{featured.contextLabel}</p>
+                          )}
+                          <h3 className="featured-project-title">{featured.title}</h3>
+                          {featured.subtitle && (
+                            <p className="featured-project-subtitle">{featured.subtitle}</p>
+                          )}
+                          <p className="featured-project-description">{featured.description}</p>
+                          {featured.highlights && (
+                            <ul className="featured-project-highlights">
+                              {featured.highlights.map((highlight) => (
+                                <li key={highlight}>{highlight}</li>
+                              ))}
+                            </ul>
+                          )}
+                          <p className="featured-project-stack">{featured.techStack}</p>
+                          {featured.demoLink && (
+                            <div className="featured-project-actions">
+                              <a
+                                href={featured.demoLink}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="btn btn-ghost"
+                              >
+                                Open full screen
+                              </a>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="featured-project-embed-phone">
+                          <button
+                            type="button"
+                            className="featured-project-phone-preview"
+                            onClick={() => setTdDemoExpanded(true)}
+                            aria-label="Expand TD First Home Hub demo"
+                          >
+                            <div className="featured-project-phone-stage">
+                              <iframe
+                                className="featured-project-embed-frame--preview"
+                                src={featured.demoLink}
+                                title="TD First Home Hub interactive mockup preview"
+                                loading="lazy"
+                                tabIndex={-1}
+                              />
+                            </div>
+                            <span className="featured-project-phone-hint">Click to interact</span>
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </a>
-              ) : (
+                    {tdDemoExpanded && featured.demoLink && (
+                      <div
+                        className="demo-phone-modal"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="TD First Home Hub demo"
+                        onClick={() => setTdDemoExpanded(false)}
+                      >
+                        <div
+                          className="demo-phone-modal-inner"
+                          onClick={(event) => event.stopPropagation()}
+                        >
+                          <button
+                            type="button"
+                            className="demo-phone-modal-close"
+                            onClick={() => setTdDemoExpanded(false)}
+                            aria-label="Close demo"
+                          >
+                            ×
+                          </button>
+                          <iframe
+                            className="demo-phone-modal-frame"
+                            src={featured.demoLink}
+                            title="TD First Home Hub interactive mockup"
+                          />
+                        </div>
+                      </div>
+                    )}
+                    {featuredProjects.length > 1 && (
+                      <div className="featured-project-controls">
+                        <button
+                          type="button"
+                          className="featured-arrow"
+                          onClick={() =>
+                            setActiveFeaturedIndex(
+                              (prev) =>
+                                (prev - 1 + featuredProjects.length) % featuredProjects.length
+                            )
+                          }
+                          aria-label="Previous featured project"
+                        >
+                          ‹
+                        </button>
+                        <div className="featured-dots">
+                          {featuredProjects.map((project, index) => (
+                            <button
+                              key={project.id}
+                              type="button"
+                              className={
+                                "featured-dot" +
+                                (index === activeFeaturedIndex ? " featured-dot--active" : "")
+                              }
+                              onClick={() => setActiveFeaturedIndex(index)}
+                              aria-label={`Featured project: ${project.title}`}
+                            />
+                          ))}
+                        </div>
+                        <button
+                          type="button"
+                          className="featured-arrow"
+                          onClick={() =>
+                            setActiveFeaturedIndex((prev) => (prev + 1) % featuredProjects.length)
+                          }
+                          aria-label="Next featured project"
+                        >
+                          ›
+                        </button>
+                      </div>
+                    )}
+                  </>
+                );
+              }
+
+              const isExpanded = Boolean(featured.highlights?.length);
+
+              const overlay = (
+                <div
+                  className={
+                    "featured-project-overlay" +
+                    (isExpanded ? " featured-project-overlay--static" : "")
+                  }
+                >
+                  <p className="featured-project-label">Featured</p>
+                  <h3 className="featured-project-title">{featured.title}</h3>
+                  {featured.subtitle && (
+                    <p className="featured-project-subtitle">{featured.subtitle}</p>
+                  )}
+                  <p className="featured-project-description">{featured.description}</p>
+                  {featured.highlights && (
+                    <ul className="featured-project-highlights">
+                      {featured.highlights.map((highlight) => (
+                        <li key={highlight}>{highlight}</li>
+                      ))}
+                    </ul>
+                  )}
+                  <p className="featured-project-stack">{featured.techStack}</p>
+                  {(featured.demoLink || featured.repoLink) && (
+                    <div className="featured-project-actions">
+                      {featured.demoLink ? (
+                        <a
+                          href={featured.demoLink}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="btn btn-ghost"
+                        >
+                          Live Demo
+                        </a>
+                      ) : (
+                        <button type="button" className="btn btn-ghost" disabled>
+                          Live Demo
+                        </button>
+                      )}
+                      {featured.repoLink && (
+                        <a
+                          href={featured.repoLink}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="btn btn-ghost"
+                        >
+                          GitHub
+                        </a>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+
+              const media = (
                 <div className="featured-project-media">
-                  {activeFeatured.video ? (
+                  {featured.video ? (
                     <video
                       className="featured-project-video"
-                      src={activeFeatured.video}
-                      poster={activeFeatured.image}
+                      src={featured.video}
+                      poster={featured.image}
                       autoPlay
                       muted
                       loop
                       playsInline
                     />
                   ) : (
-                    activeFeatured.image && (
+                    featured.image && (
                       <img
-                        src={activeFeatured.image}
-                        alt={activeFeatured.title}
+                        src={featured.image}
+                        alt={featured.title}
                         className="featured-project-image"
                       />
                     )
                   )}
-                  <div className="featured-project-overlay">
-                    <p className="featured-project-label">Featured</p>
-                    <h3 className="featured-project-title">{activeFeatured.title}</h3>
-                    <p className="featured-project-subtitle">{activeFeatured.subtitle}</p>
-                    <p className="featured-project-description">{activeFeatured.description}</p>
-                    <p className="featured-project-stack">{activeFeatured.techStack}</p>
-                  </div>
+                  {overlay}
                 </div>
-              )}
-            </div>
+              );
+
+              return (
+                <>
+                  <div
+                    className={
+                      "featured-project-card" +
+                      (isExpanded ? " featured-project-card--static" : "")
+                    }
+                  >
+                    {!isExpanded && featured.link ? (
+                      <a
+                        href={featured.link}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="featured-project-link"
+                      >
+                        {media}
+                      </a>
+                    ) : (
+                      media
+                    )}
+                  </div>
+                  {featuredProjects.length > 1 && (
+                    <div className="featured-project-controls">
+                      <button
+                        type="button"
+                        className="featured-arrow"
+                        onClick={() =>
+                          setActiveFeaturedIndex(
+                            (prev) =>
+                              (prev - 1 + featuredProjects.length) % featuredProjects.length
+                          )
+                        }
+                        aria-label="Previous featured project"
+                      >
+                        ‹
+                      </button>
+                      <div className="featured-dots">
+                        {featuredProjects.map((project, index) => (
+                          <button
+                            key={project.id}
+                            type="button"
+                            className={
+                              "featured-dot" +
+                              (index === activeFeaturedIndex ? " featured-dot--active" : "")
+                            }
+                            onClick={() => setActiveFeaturedIndex(index)}
+                            aria-label={`Featured project: ${project.title}`}
+                          />
+                        ))}
+                      </div>
+                      <button
+                        type="button"
+                        className="featured-arrow"
+                        onClick={() =>
+                          setActiveFeaturedIndex((prev) => (prev + 1) % featuredProjects.length)
+                        }
+                        aria-label="Next featured project"
+                      >
+                        ›
+                      </button>
+                    </div>
+                  )}
+                </>
+              );
+            })()}
           </div>
 
           <div className="projects-filter">
-            {[
-              { id: "all", label: "All" },
-              { id: "full-stack", label: "Full-Stack" },
-              { id: "frontend-uiux", label: "Frontend / UI-UX" },
-              { id: "backend-ml", label: "Backend / ML" },
-              { id: "frontend-ml", label: "Frontend + ML (Hybrid)" },
-              { id: "cad", label: "CAD" }
-            ].map((filter) => (
+            {PROJECT_FILTERS.map((filter) => (
               <button
                 key={filter.id}
                 type="button"
                 className={
                   "projects-filter-chip" +
+                  (filter.id !== "all" ? ` projects-filter-chip--${filter.id}` : "") +
                   (activeProjectFilter === filter.id ? " projects-filter-chip--active" : "")
                 }
-                onClick={() =>
-                  setActiveProjectFilter(filter.id as typeof activeProjectFilter)
-                }
+                onClick={() => setActiveProjectFilter(filter.id)}
               >
+                {filter.id !== "all" && (
+                  <span
+                    className={`project-orbit-dot project-orbit-dot--${filter.id}`}
+                    aria-hidden="true"
+                  />
+                )}
                 {filter.label}
               </button>
             ))}
           </div>
 
-          <div className="projects-grid">
-            {otherProjects.map((project) => {
-              const content = (
-                <>
-                  <div className="project-header">
-                    <div className="project-orbit-dot" />
-                    <h3>{project.title}</h3>
-                  </div>
-                  <p className="project-subtitle">{project.subtitle}</p>
-                  <p className="project-body">{project.description}</p>
-                  <p className="project-stack">{project.techStack}</p>
-                </>
-              );
+          {activeProjectFilter === "all" ? (
+          <div className="projects-timeline-shell">
+            <div className="projects-timeline-header">
+              <div>
+                <p className="projects-timeline-eyebrow">More work</p>
+                <h3 className="projects-timeline-heading">Built with</h3>
+              </div>
+              <p className="projects-timeline-hint">
+                Languages &amp; tools per project · Click a node for details
+              </p>
+            </div>
 
-              return project.link ? (
-                <a
-                  key={project.id}
-                  href={project.link}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="project-card hover-lift project-card--link"
-                >
-                  {content}
-                </a>
-              ) : (
-                <article key={project.id} className="project-card hover-lift">
-                  {content}
-                </article>
-              );
-            })}
+            <div
+              className={
+                "projects-timeline-marquee" +
+                (expandedProjectId ? " projects-timeline-marquee--paused" : "")
+              }
+            >
+              <div className="projects-timeline-rail" aria-hidden="true" />
+              <div className="projects-timeline-marquee-inner" role="list">
+                <div className="projects-timeline-row">
+                  {otherProjects.map((project, index) =>
+                    renderProjectTimelineStep(project, index, "a")
+                  )}
+                </div>
+                <div className="projects-timeline-row" aria-hidden="true">
+                  {otherProjects.map((project, index) =>
+                    renderProjectTimelineStep(project, index, "b")
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {expandedProjectId && (
+              <div className="projects-timeline-detail">
+                {(() => {
+                  const project = otherProjects.find((item) => item.id === expandedProjectId);
+                  if (!project) return null;
+
+                  return (
+                    <>
+                      <button
+                        type="button"
+                        className="projects-timeline-detail-close"
+                        onClick={() => setExpandedProjectId(null)}
+                        aria-label="Close project details"
+                      >
+                        ×
+                      </button>
+                      <div className="projects-timeline-detail-top">
+                        <div>
+                          <p className="projects-timeline-detail-eyebrow">Selected project</p>
+                          <h3 className="projects-timeline-detail-title">{project.title}</h3>
+                          <p className="projects-timeline-detail-subtitle">{project.subtitle}</p>
+                        </div>
+                        <div className="projects-timeline-detail-tags">
+                          {project.categories.map((category) => (
+                            <span
+                              key={category}
+                              className={`projects-timeline-tag projects-timeline-tag--${category}`}
+                            >
+                              {PROJECT_CATEGORY_LABELS[category]}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <p className="project-body">{project.description}</p>
+                      <p className="project-stack">{project.techStack}</p>
+                      {project.link && (
+                        <a
+                          href={project.link}
+                          {...(project.link.startsWith("#")
+                            ? {}
+                            : { target: "_blank", rel: "noreferrer" })}
+                          className="projects-timeline-link"
+                        >
+                          {project.link.startsWith("#") ? "View on this page" : "View project →"}
+                        </a>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
+            )}
           </div>
+          ) : (
+            <div className="projects-grid">
+              {otherProjects.map((project) => {
+                const content = (
+                  <>
+                    <div className="project-header">
+                      <div
+                        className="project-category-dots"
+                        aria-label={project.categories
+                          .map((category) => PROJECT_CATEGORY_LABELS[category])
+                          .join(", ")}
+                      >
+                        {project.categories.map((category) => (
+                          <span
+                            key={category}
+                            className={`project-orbit-dot project-orbit-dot--${category}`}
+                            title={PROJECT_CATEGORY_LABELS[category]}
+                          />
+                        ))}
+                      </div>
+                      <h3>{project.title}</h3>
+                    </div>
+                    <p className="project-subtitle">{project.subtitle}</p>
+                    <p className="project-body">{project.description}</p>
+                    <p className="project-stack">{project.techStack}</p>
+                  </>
+                );
+
+                return project.link ? (
+                  <a
+                    key={project.id}
+                    href={project.link}
+                    {...(project.link.startsWith("#")
+                      ? {}
+                      : { target: "_blank", rel: "noreferrer" })}
+                    className="project-card hover-lift project-card--link"
+                  >
+                    {content}
+                  </a>
+                ) : (
+                  <article key={project.id} className="project-card hover-lift">
+                    {content}
+                  </article>
+                );
+              })}
+            </div>
+          )}
         </section>
 
         <section id="writing" className="section section-contact">
